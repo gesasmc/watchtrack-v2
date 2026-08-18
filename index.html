@@ -12,13 +12,14 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icons/icon-180.png" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="features.css" />
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
       <div>
         <div class="eyebrow">FILME · SERIEN · FORTSCHRITT</div>
-        <h1>WatchTrack <small style="font-size:.38em;font-weight:700;vertical-align:middle;opacity:.65">v2.1</small></h1>
+        <h1>WatchTrack <small class="version-badge">v2.1</small></h1>
       </div>
       <button id="refreshBtn" class="icon-btn" aria-label="Aktualisieren">↻</button>
     </header>
@@ -63,11 +64,11 @@
           <div class="stat"><strong id="statCompleted">0</strong><span>fertig</span></div>
           <div class="stat"><strong id="statWatchlist">0</strong><span>Watchlist</span></div>
         </div>
-        <div class="segmented" role="tablist">
+        <div class="segmented" role="tablist" aria-label="Listenstatus">
           <button class="seg active" data-libfilter="all">Alle</button>
-          <button class="seg" data-libfilter="watching">Schauen</button>
-          <button class="seg" data-libfilter="completed">Fertig</button>
-          <button class="seg" data-libfilter="watchlist">Später</button>
+          <button class="seg" data-libfilter="watchlist">Will ich sehen</button>
+          <button class="seg" data-libfilter="watching">Schaue ich</button>
+          <button class="seg" data-libfilter="completed">Gesehen</button>
         </div>
         <div id="libraryContent" class="library-list"></div>
       </section>
@@ -138,5 +139,6 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="app.js"></script>
+  <script src="features.js"></script>
 </body>
 </html>
