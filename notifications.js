@@ -1,4 +1,4 @@
-/* WatchTrack v2.6 – Web Push für neue Serienfolgen */
+/* WatchTrack v2.8.1 – Web Push für Folgen, neue Staffeln und Filmstarts */
 (() => {
   const PUBLIC_KEY = 'BHjRoFjjU8esZFeq_e4xgw2tjki12EXf8-S8l2FtlzhyXJSE2YU7oDUXRqWm_vSf5RcFY4KRmJDt2Zy9adI_Rbc';
   const API = './api/push-subscribe';
@@ -77,7 +77,7 @@
       let sub = await reg.pushManager.getSubscription();
       if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToBytes(PUBLIC_KEY) });
       await api('POST', { subscription: subscriptionJson(sub), tmdbToken: token });
-      status('Mitteilungen sind aktiv. Neue Folgen deiner Serien können jetzt gemeldet werden.', 'ok');
+      status('Mitteilungen sind aktiv. Neue Folgen, Staffeln und Filmstarts können jetzt gemeldet werden.', 'ok');
       await refresh();
     } catch (e) { status(e.message, 'error'); }
   }
@@ -110,14 +110,14 @@
     card.className = 'settings-card push-card';
     card.innerHTML = `
       <h2>Mitteilungen</h2>
-      <p>WatchTrack kann dich benachrichtigen, wenn bei einer Serie aus eurer gemeinsamen Liste neue Folgen erscheinen.</p>
+      <p>WatchTrack kann euch benachrichtigen, wenn neue Folgen erscheinen, eine neue Staffel startet oder ein vorgemerkter Film seinen Veröffentlichungstermin erreicht.</p>
       <div id="pushStatus" class="status"></div>
       <div class="row gap wrap">
         <button id="pushEnableBtn" class="primary">Mitteilungen aktivieren</button>
         <button id="pushTestBtn" class="secondary" hidden>Test senden</button>
         <button id="pushDisableBtn" class="secondary" hidden>Ausschalten</button>
       </div>
-      <p class="help-text">Nur Serien mit dem Status „Will ich sehen“ oder „Schaue ich“ werden geprüft. Bereits abgehakte Folgen werden nicht gemeldet.</p>`;
+      <p class="help-text">Auch fertig gesehene Serien bleiben für neue Staffeln im Blick. Bereits gemeldete Folgen, Staffeln und Filmstarts werden nicht doppelt gemeldet.</p>`;
     if (syncCard?.nextSibling) settings.insertBefore(card, syncCard.nextSibling); else settings.prepend(card);
     document.querySelector('#pushEnableBtn').addEventListener('click', enablePush);
     document.querySelector('#pushDisableBtn').addEventListener('click', disablePush);
