@@ -1,22 +1,27 @@
-/* WatchTrack v2.5 – gemeinsame Liste ohne Konten */
+/* WatchTrack v2.5.1 – gemeinsame Liste mit Familien-Key */
 (() => {
   const SYNC_URL = './api/sync';
   const KEY_STORE = 'wt_family_key';
   const DEL_STORE = 'wt_deleted';
+  const KEY_RE = /^[A-Za-z0-9_-]{24,128}$/;
   let familyKey = '';
   let syncing = false;
   let syncTimer = 0;
   let previous = JSON.parse(JSON.stringify(state.library || {}));
 
-  function readFamilyFromHash() {
+  function normalizeKey(value = '') {
+    return String(value).trim().replace(/^#?family=/i, '');
+  }
+
+  function readFamilyKey() {
     const hash = new URLSearchParams(location.hash.replace(/^#/, ''));
-    const key = hash.get('family') || '';
-    if (/^[A-Za-z0-9_-]{24,128}$/.test(key)) {
-      localStorage.setItem(KEY_STORE, key);
-      return key;
+    const fromHash = normalizeKey(hash.get('family') || '');
+    if (KEY_RE.test(fromHash)) {
+      localStorage.setItem(KEY_STORE, fromHash);
+      return fromHash;
     }
-    const stored = localStorage.getItem(KEY_STORE) || '';
-    return /^[A-Za-z0-9_-]{24,128}$/.test(stored) ? stored : '';
+    const stored = normalizeKey(localStorage.getItem(KEY_STORE) || '');
+    return KEY_RE.test(stored) ? stored : '';
   }
 
   function randomKey() {
@@ -72,7 +77,7 @@
   }
 
   async function request(method, body) {
-    if (!familyKey) throw new Error('Kein gemeinsamer Link aktiv');
+    if (!familyKey) throw new Error('Kein Familien-Key aktiv');
     const r = await fetch(SYNC_URL, {
       method,
       headers: { 'content-type': 'application/json', 'x-watchtrack-family': familyKey },
@@ -125,9 +130,41 @@
   };
 
   function sharedLink() {
-    const u = new URL(location.href);
+    const u = new URL(location.origin + location.pathname);
     u.hash = `family=${familyKey}`;
     return u.toString();
+  }
+
+  function connectKey(key) {
+    const clean = normalizeKey(key);
+    if (!KEY_RE.test(clean)) {
+      setSyncStatus('Der Familien-Key ist ungültig.', 'error');
+      return false;
+    }
+    familyKey = clean;
+    localStorage.setItem(KEY_STORE, familyKey);
+    const input = document.querySelector('#familyKeyInput');
+    if (input) input.value = familyKey;
+    refreshUi();
+    syncNow();
+    return true;
+  }
+
+  function refreshUi() {
+    const create = document.querySelector('#familyCreateBtn');
+    const sync = document.querySelector('#familySyncBtn');
+    const leave = document.querySelector('#familyLeaveBtn');
+    const input = document.querySelector('#familyKeyInput');
+    const connect = document.querySelector('#familyConnectBtn');
+    const copy = document.querySelector('#familyCopyKeyBtn');
+    if (!create) return;
+    create.textContent = familyKey ? 'Gemeinsamen Link teilen' : 'Neue gemeinsame Liste starten';
+    if (sync) sync.hidden = !familyKey;
+    if (leave) leave.hidden = !familyKey;
+    if (copy) copy.hidden = !familyKey;
+    if (connect) connect.textContent = familyKey ? 'Anderen Key verbinden' : 'Mit Key verbinden';
+    if (input && familyKey) input.value = familyKey;
+    setSyncStatus(familyKey ? 'Gemeinsame Liste verbunden' : 'Noch nicht verbunden', familyKey ? 'ok' : '');
   }
 
   function mountUI() {
@@ -139,34 +176,37 @@
     card.className = 'settings-card family-sync-card';
     card.innerHTML = `
       <h2>Gemeinsame Liste</h2>
-      <p>Ein gemeinsamer Link für euch beide. Kein Konto nötig. Änderungen an Filmen, Serien und Folgen werden automatisch abgeglichen.</p>
+      <p>Ein Familien-Key verbindet eure Geräte. So funktioniert die Synchronisation auch in der Home-Screen-Web-App.</p>
       <div id="familySyncStatus" class="status"></div>
-      <div class="row gap wrap">
-        <button id="familyCreateBtn" class="primary">${familyKey ? 'Gemeinsamen Link teilen' : 'Gemeinsame Liste starten'}</button>
+      <label for="familyKeyInput" class="family-key-label">Familien-Key</label>
+      <div class="family-key-row">
+        <input id="familyKeyInput" class="family-key-input" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Familien-Key hier einfügen" value="${familyKey}">
+        <button id="familyConnectBtn" class="secondary" type="button">${familyKey ? 'Anderen Key verbinden' : 'Mit Key verbinden'}</button>
+      </div>
+      <div class="row gap wrap family-sync-actions">
+        <button id="familyCreateBtn" class="primary">${familyKey ? 'Gemeinsamen Link teilen' : 'Neue gemeinsame Liste starten'}</button>
+        <button id="familyCopyKeyBtn" class="secondary" ${familyKey ? '' : 'hidden'}>Key kopieren</button>
         <button id="familySyncBtn" class="secondary" ${familyKey ? '' : 'hidden'}>Jetzt synchronisieren</button>
         <button id="familyLeaveBtn" class="secondary" ${familyKey ? '' : 'hidden'}>Verbindung lösen</button>
       </div>
-      <p class="help-text">Wer den vollständigen Familien-Link besitzt, kann dieselbe Liste bearbeiten.</p>`;
+      <p class="help-text">Auf dem zweiten Handy einfach denselben Key einmal unter Setup einfügen. Danach wird er auf diesem Gerät gespeichert.</p>`;
     if (first) settings.insertBefore(card, first); else settings.prepend(card);
 
-    const refreshUi = () => {
-      document.querySelector('#familyCreateBtn').textContent = familyKey ? 'Gemeinsamen Link teilen' : 'Gemeinsame Liste starten';
-      document.querySelector('#familySyncBtn').hidden = !familyKey;
-      document.querySelector('#familyLeaveBtn').hidden = !familyKey;
-      setSyncStatus(familyKey ? 'Gemeinsame Liste verbunden' : 'Noch nicht verbunden', familyKey ? 'ok' : '');
-    };
-
+    document.querySelector('#familyConnectBtn').addEventListener('click', () => connectKey(document.querySelector('#familyKeyInput').value));
+    document.querySelector('#familyKeyInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') connectKey(e.currentTarget.value);
+    });
     document.querySelector('#familyCreateBtn').addEventListener('click', async () => {
       if (!familyKey) {
         familyKey = randomKey();
         localStorage.setItem(KEY_STORE, familyKey);
-        location.hash = `family=${familyKey}`;
+        document.querySelector('#familyKeyInput').value = familyKey;
         refreshUi();
         await syncNow();
       }
       const link = sharedLink();
       try {
-        if (navigator.share) await navigator.share({ title: 'WatchTrack – gemeinsame Liste', text: 'Unsere gemeinsame WatchTrack-Liste', url: link });
+        if (navigator.share) await navigator.share({ title: 'WatchTrack – gemeinsame Liste', text: `Unsere gemeinsame WatchTrack-Liste\nFamilien-Key: ${familyKey}`, url: link });
         else {
           await navigator.clipboard.writeText(link);
           toast('Gemeinsamer Link kopiert');
@@ -175,17 +215,27 @@
         if (e?.name !== 'AbortError') prompt('Diesen Link teilen:', link);
       }
     });
+    document.querySelector('#familyCopyKeyBtn').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(familyKey);
+        toast('Familien-Key kopiert');
+      } catch {
+        prompt('Familien-Key kopieren:', familyKey);
+      }
+    });
     document.querySelector('#familySyncBtn').addEventListener('click', () => syncNow());
     document.querySelector('#familyLeaveBtn').addEventListener('click', () => {
       localStorage.removeItem(KEY_STORE);
       familyKey = '';
+      const input = document.querySelector('#familyKeyInput');
+      if (input) input.value = '';
       if (location.hash.includes('family=')) history.replaceState(null, '', location.pathname + location.search);
       refreshUi();
     });
     refreshUi();
   }
 
-  familyKey = readFamilyFromHash();
+  familyKey = readFamilyKey();
   mountUI();
   if (familyKey) syncNow({ silent: true });
   setInterval(() => { if (familyKey && !document.hidden) syncNow({ silent: true }); }, 8000);
