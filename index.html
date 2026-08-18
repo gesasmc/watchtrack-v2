@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="WatchTrack" />
-  <meta name="format-detection" content="telephone=no" />
+  <meta name="format-detection" content="no" />
   <title>WatchTrack</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icons/icon-180.png" />
@@ -17,138 +17,19 @@
   <link rel="stylesheet" href="v24.css" />
   <link rel="stylesheet" href="sync.css" />
   <link rel="stylesheet" href="notifications.css" />
+  <link rel="stylesheet" href="next-up.css" />
 </head>
 <body>
   <div class="app-shell">
-    <header class="topbar">
-      <div>
-        <div class="eyebrow">FILME · SERIEN · FORTSCHRITT</div>
-        <h1>WatchTrack <small class="version-tag">v2.6</small></h1>
-      </div>
-      <button id="refreshBtn" class="icon-btn" aria-label="Aktualisieren">↻</button>
-    </header>
-
+    <header class="topbar"><div><div class="eyebrow">FILME · SERIEN · FORTSCHRITT</div><h1>WatchTrack <small class="version-tag">v2.7</small></h1></div><button id="refreshBtn" class="icon-btn" aria-label="Aktualisieren">↻</button></header>
     <main id="main">
-      <section id="view-discover" class="view active">
-        <div class="segmented media-switch" role="tablist" aria-label="Medientyp">
-          <button class="seg" data-discover-type="movie">Filme</button>
-          <button class="seg active" data-discover-type="tv">Serien</button>
-        </div>
-
-        <div class="section-head discover-head">
-          <div>
-            <h2 id="discoverTitle">Kommende Serien</h2>
-            <p id="discoverHint">Neue Serien mit angekündigtem Start · Region Deutschland</p>
-          </div>
-        </div>
-
-        <div id="categoryChips" class="chip-row" aria-label="Kategorie"></div>
-        <div id="discoverContent" class="card-grid"></div>
-        <button id="loadMoreBtn" class="secondary load-more" hidden>Mehr laden</button>
-      </section>
-
-      <section id="view-search" class="view">
-        <div class="search-wrap">
-          <input id="searchInput" type="search" placeholder="Film oder Serie suchen …" autocomplete="off" enterkeyhint="search" />
-          <button id="searchBtn" class="primary small">Suchen</button>
-        </div>
-        <div class="section-head compact-head">
-          <div>
-            <h2>Gesamten Katalog durchsuchen</h2>
-            <p>Filme und Serien aus der TMDB-Datenbank.</p>
-          </div>
-        </div>
-        <div id="searchResults" class="card-grid"></div>
-        <button id="searchMoreBtn" class="secondary load-more" hidden>Mehr Treffer</button>
-      </section>
-
-      <section id="view-library" class="view">
-        <div class="library-stats">
-          <div class="stat"><strong id="statWatching">0</strong><span>Schaue ich</span></div>
-          <div class="stat"><strong id="statCompleted">0</strong><span>Gesehen</span></div>
-          <div class="stat"><strong id="statWatchlist">0</strong><span>Will ich sehen</span></div>
-        </div>
-        <div class="segmented" role="tablist">
-          <button class="seg active" data-libfilter="all">Alle</button>
-          <button class="seg" data-libfilter="watching">Schaue ich</button>
-          <button class="seg" data-libfilter="completed">Gesehen</button>
-          <button class="seg" data-libfilter="watchlist">Will ich sehen</button>
-        </div>
-        <div id="libraryContent" class="library-list"></div>
-      </section>
-
-      <section id="view-settings" class="view">
-        <div class="settings-card connection-card">
-          <div class="settings-title-row">
-            <div>
-              <h2>TMDB verbinden</h2>
-              <p>Damit WatchTrack aktuelle und vorhandene Filme, Serien, Staffeln und Folgen abrufen kann.</p>
-            </div>
-            <span id="connectionDot" class="connection-dot" aria-label="Verbindungsstatus"></span>
-          </div>
-          <label for="tokenInput">API Read Access Token</label>
-          <textarea id="tokenInput" rows="3" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="eyJhbGciOiJIUzI1NiJ9…"></textarea>
-          <div class="row gap wrap">
-            <button id="saveTokenBtn" class="primary">Speichern & testen</button>
-            <button id="clearTokenBtn" class="secondary">Entfernen</button>
-          </div>
-          <div id="tokenStatus" class="status"></div>
-          <p class="help-text">Den Read Access Token findest du in deinem TMDB-Konto unter API. Normalerweise bleibt er in diesem Browser; wenn du Mitteilungen aktivierst, wird er zusätzlich für die Hintergrundprüfung in eurer privaten D1-Datenbank gespeichert.</p>
-          <a class="text-link" href="https://www.themoviedb.org/settings/api" target="_blank" rel="noreferrer">TMDB API-Einstellungen öffnen ↗</a>
-        </div>
-
-        <div class="settings-card">
-          <h2>Region & Sprache</h2>
-          <p>Die Region beeinflusst z. B. kommende Kinostarts und Streaming-Anbieter.</p>
-          <label for="regionSelect">Region</label>
-          <select id="regionSelect">
-            <option value="DE">Deutschland</option>
-            <option value="AT">Österreich</option>
-            <option value="CH">Schweiz</option>
-          </select>
-        </div>
-
-        <div class="settings-card">
-          <h2>Lokale Daten</h2>
-          <p>Watchlist und Episodenfortschritt sichern oder auf ein anderes Gerät übertragen.</p>
-          <div class="row gap wrap settings-actions">
-            <button id="exportBtn" class="secondary">Backup exportieren</button>
-            <label class="secondary file-label">Backup importieren<input id="importInput" type="file" accept="application/json" hidden /></label>
-            <button id="resetBtn" class="danger">Watch-Daten löschen</button>
-          </div>
-        </div>
-
-        <div class="settings-card">
-          <h2>Datenschutz & Quelle</h2>
-          <p>WatchTrack hat keinen eigenen Account. Deine Watch-Daten liegen lokal in <code>localStorage</code> und bei aktivierter gemeinsamer Liste zusätzlich in eurer D1-Datenbank. Für Katalogdaten wird die TMDB API über das Internet abgefragt.</p>
-          <p class="tmdb-note">This product uses the TMDB API but is not endorsed or certified by TMDB.</p>
-          <p class="tmdb-note">Streaming-Anbieterdaten werden über TMDB bereitgestellt und stammen von JustWatch.</p>
-          <a class="text-link" href="https://www.themoviedb.org" target="_blank" rel="noreferrer">The Movie Database ↗</a>
-        </div>
-      </section>
+      <section id="view-discover" class="view active"><div class="segmented media-switch" role="tablist" aria-label="Medientyp"><button class="seg" data-discover-type="movie">Filme</button><button class="seg active" data-discover-type="tv">Serien</button></div><div class="section-head discover-head"><div><h2 id="discoverTitle">Kommende Serien</h2><p id="discoverHint">Neue Serien mit angekündigtem Start · Region Deutschland</p></div></div><div id="categoryChips" class="chip-row" aria-label="Kategorie"></div><div id="discoverContent" class="card-grid"></div><button id="loadMoreBtn" class="secondary load-more" hidden>Mehr laden</button></section>
+      <section id="view-search" class="view"><div class="search-wrap"><input id="searchInput" type="search" placeholder="Film oder Serie suchen …" autocomplete="off" enterkeyhint="search" /><button id="searchBtn" class="primary small">Suchen</button></div><div class="section-head compact-head"><div><h2>Gesamten Katalog durchsuchen</h2><p>Filme und Serien aus der TMDB-Datenbank.</p></div></div><div id="searchResults" class="card-grid"></div><button id="searchMoreBtn" class="secondary load-more" hidden>Mehr Treffer</button></section>
+      <section id="view-library" class="view"><div class="library-stats"><div class="stat"><strong id="statWatching">0</strong><span>Schaue ich</span></div><div class="stat"><strong id="statCompleted">0</strong><span>Gesehen</span></div><div class="stat"><strong id="statWatchlist">0</strong><span>Will ich sehen</span></div></div><div class="segmented" role="tablist"><button class="seg active" data-libfilter="all">Alle</button><button class="seg" data-libfilter="watching">Schaue ich</button><button class="seg" data-libfilter="completed">Gesehen</button><button class="seg" data-libfilter="watchlist">Will ich sehen</button></div><div id="libraryContent" class="library-list"></div></section>
+      <section id="view-settings" class="view"><div class="settings-card connection-card"><div class="settings-title-row"><div><h2>TMDB verbinden</h2><p>Damit WatchTrack aktuelle und vorhandene Filme, Serien, Staffeln und Folgen abrufen kann.</p></div><span id="connectionDot" class="connection-dot" aria-label="Verbindungsstatus"></span></div><label for="tokenInput">API Read Access Token</label><textarea id="tokenInput" rows="3" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="eyJhbGciOiJIUzI1NiJ9…"></textarea><div class="row gap wrap"><button id="saveTokenBtn" class="primary">Speichern & testen</button><button id="clearTokenBtn" class="secondary">Entfernen</button></div><div id="tokenStatus" class="status"></div><p class="help-text">Den Read Access Token findest du in deinem TMDB-Konto unter API. Normalerweise bleibt er in diesem Browser; wenn du Mitteilungen aktivierst, wird er zusätzlich für die Hintergrundprüfung in eurer privaten D1-Datenbank gespeichert.</p><a class="text-link" href="https://www.themoviedb.org/settings/api" target="_blank" rel="noreferrer">TMDB API-Einstellungen öffnen ↗</a></div><div class="settings-card"><h2>Region & Sprache</h2><p>Die Region beeinflusst z. B. kommende Kinostarts und Streaming-Anbieter.</p><label for="regionSelect">Region</label><select id="regionSelect"><option value="DE">Deutschland</option><option value="AT">Österreich</option><option value="CH">Schweiz</option></select></div><div class="settings-card"><h2>Lokale Daten</h2><p>Watchlist und Episodenfortschritt sichern oder auf ein anderes Gerät übertragen.</p><div class="row gap wrap settings-actions"><button id="exportBtn" class="secondary">Backup exportieren</button><label class="secondary file-label">Backup importieren<input id="importInput" type="file" accept="application/json" hidden /></label><button id="resetBtn" class="danger">Watch-Daten löschen</button></div></div><div class="settings-card"><h2>Datenschutz & Quelle</h2><p>WatchTrack hat keinen eigenen Account. Deine Watch-Daten liegen lokal in <code>localStorage</code> und bei aktivierter gemeinsamer Liste zusätzlich in eurer D1-Datenbank. Für Katalogdaten wird die TMDB API über das Internet abgefragt.</p><p class="tmdb-note">This product uses the TMDB API but is not endorsed or certified by TMDB.</p><p class="tmdb-note">Streaming-Anbieterdaten werden über TMDB bereitgestellt und stammen von JustWatch.</p><a class="text-link" href="https://www.themoviedb.org" target="_blank" rel="noreferrer">The Movie Database ↗</a></div></section>
     </main>
-
-    <nav class="bottom-nav" aria-label="Hauptnavigation">
-      <button class="nav-btn active" data-view="discover"><span>◉</span><small>Entdecken</small></button>
-      <button class="nav-btn" data-view="search"><span>⌕</span><small>Suche</small></button>
-      <button class="nav-btn" data-view="library"><span>✓</span><small>Meine Liste</small></button>
-      <button class="nav-btn" data-view="settings"><span>⚙</span><small>Setup</small></button>
-    </nav>
+    <nav class="bottom-nav" aria-label="Hauptnavigation"><button class="nav-btn active" data-view="discover"><span>◉</span><small>Entdecken</small></button><button class="nav-btn" data-view="search"><span>⌕</span><small>Suche</small></button><button class="nav-btn" data-view="library"><span>✓</span><small>Meine Liste</small></button><button class="nav-btn" data-view="settings"><span>⚙</span><small>Setup</small></button></nav>
   </div>
-
-  <dialog id="detailDialog">
-    <div id="detailContent"></div>
-    <button id="closeDialogBtn" class="dialog-close" aria-label="Schließen">×</button>
-  </dialog>
-
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="app.js"></script>
-  <script src="features.js"></script>
-  <script src="custom.js"></script>
-  <script src="v24.js"></script>
-  <script src="sync.js"></script>
-  <script src="series-first.js"></script>
-  <script src="stable-progress.js"></script>
-  <script src="notifications.js"></script>
-</body>
-</html>
+  <dialog id="detailDialog"><div id="detailContent"></div><button id="closeDialogBtn" class="dialog-close" aria-label="Schließen">×</button></dialog><div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script><script src="features.js"></script><script src="custom.js"></script><script src="v24.js"></script><script src="sync.js"></script><script src="series-first.js"></script><script src="stable-progress.js"></script><script src="notifications.js"></script><script src="next-up.js"></script>
+</body></html>
