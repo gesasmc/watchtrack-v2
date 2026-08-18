@@ -21,7 +21,7 @@
 </head>
 <body>
   <div class="app-shell">
-    <header class="topbar"><div><div class="eyebrow">FILME · SERIEN · FORTSCHRITT</div><h1>WatchTrack <small class="version-tag">v2.7.4</small></h1></div><button id="refreshBtn" class="icon-btn" aria-label="Aktualisieren">↻</button></header>
+    <header class="topbar"><div><div class="eyebrow">FILME · SERIEN · FORTSCHRITT</div><h1>WatchTrack <small class="version-tag">v2.8</small></h1></div><button id="refreshBtn" class="icon-btn" aria-label="Aktualisieren">↻</button></header>
     <main id="main">
       <section id="view-discover" class="view active"><div class="segmented media-switch" role="tablist" aria-label="Medientyp"><button class="seg" data-discover-type="movie">Filme</button><button class="seg active" data-discover-type="tv">Serien</button></div><div class="section-head discover-head"><div><h2 id="discoverTitle">Kommende Serien</h2><p id="discoverHint">Neue Serien mit angekündigtem Start · Region Deutschland</p></div></div><div id="categoryChips" class="chip-row" aria-label="Kategorie"></div><div id="discoverContent" class="card-grid"></div><button id="loadMoreBtn" class="secondary load-more" hidden>Mehr laden</button></section>
       <section id="view-search" class="view"><div class="search-wrap"><input id="searchInput" type="search" placeholder="Film oder Serie suchen …" autocomplete="off" enterkeyhint="search" /><button id="searchBtn" class="primary small">Suchen</button></div><div class="section-head compact-head"><div><h2>Gesamten Katalog durchsuchen</h2><p>Filme und Serien aus der TMDB-Datenbank.</p></div></div><div id="searchResults" class="card-grid"></div><button id="searchMoreBtn" class="secondary load-more" hidden>Mehr Treffer</button></section>
@@ -31,5 +31,5 @@
     <nav class="bottom-nav" aria-label="Hauptnavigation"><button class="nav-btn active" data-view="discover"><span>◉</span><small>Entdecken</small></button><button class="nav-btn" data-view="search"><span>⌕</span><small>Suche</small></button><button class="nav-btn" data-view="library"><span>✓</span><small>Meine Liste</small></button><button class="nav-btn" data-view="settings"><span>⚙</span><small>Setup</small></button></nav>
   </div>
   <dialog id="detailDialog"><div id="detailContent"></div><button id="closeDialogBtn" class="dialog-close" aria-label="Schließen">×</button></dialog><div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="app.js"></script><script src="features.js"></script><script src="custom.js"></script><script src="v24.js"></script><script src="sync.js"></script><script src="series-first.js"></script><script src="stable-progress.js"></script><script src="notifications.js"></script><script src="next-up.js"></script>
+  <script src="app.js"></script><script src="features.js"></script><script src="custom.js"></script><script src="v24.js"></script><script src="sync.js"></script><script src="series-first.js"></script><script src="stable-progress.js"></script><script src="notifications.js"></script><script src="next-up.js"></script><script src="recommendations.js"></script>
 </body></html>
