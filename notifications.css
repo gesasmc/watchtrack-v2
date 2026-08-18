@@ -1,0 +1,1 @@
+.push-card{border-color:rgba(124,92,255,.28)}.push-card .status{min-height:1.2em;margin:10px 0 14px}.push-card .status[data-kind="ok"]{color:#8fe388}.push-card .status[data-kind="busy"]{color:#c7b7ff}.push-card .status[data-kind="error"]{color:#ff8d8d}.push-card .status[data-kind="warn"]{color:#ffd48a}
