@@ -4,6 +4,7 @@ WatchTrack ist eine statische Progressive Web App für iPhone/Safari. Die App-Ob
 
 <!-- deployment-test: 2026-08-18 -->
 <!-- d1-binding-redeploy: 2026-08-18T19:52+02:00 -->
+<!-- vapid-secret-redeploy: 2026-08-18T20:55+02:00 -->
 
 ## Funktionen
 
