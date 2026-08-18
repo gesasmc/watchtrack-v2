@@ -2,6 +2,8 @@
 
 WatchTrack ist eine statische Progressive Web App für iPhone/Safari. Die App-Oberfläche und deine Watch-Daten sind lokal; aktuelle Katalogdaten werden direkt von der TMDB API geladen.
 
+<!-- deployment-test: 2026-08-18 -->
+
 ## Funktionen
 
 - Filme: **Bald**, **Jetzt im Kino**, **Beliebt**, **Top bewertet**, **Katalog**
