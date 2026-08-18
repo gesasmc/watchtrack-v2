@@ -13,11 +13,13 @@ export async function onRequestGet({ request, env }) {
   const key = familyKey(request);
   if (!key) return json({ error: 'Ungültiger Familien-Schlüssel' }, 401);
   const row = await env.DB.prepare('SELECT payload, updated_at FROM shared_lists WHERE family_key = ?').bind(key).first();
-  if (!row) return json({ library: {}, updatedAt: 0 });
+  if (!row) return json({ state: { library: {}, deleted: {} }, updatedAt: 0 });
   try {
-    return json({ library: JSON.parse(row.payload || '{}'), updatedAt: Number(row.updated_at || 0) });
+    const parsed = JSON.parse(row.payload || '{}');
+    const state = parsed && parsed.library ? parsed : { library: parsed || {}, deleted: {} };
+    return json({ state, updatedAt: Number(row.updated_at || 0) });
   } catch {
-    return json({ library: {}, updatedAt: Number(row.updated_at || 0) });
+    return json({ state: { library: {}, deleted: {} }, updatedAt: Number(row.updated_at || 0) });
   }
 }
 
@@ -26,8 +28,11 @@ export async function onRequestPut({ request, env }) {
   const key = familyKey(request);
   if (!key) return json({ error: 'Ungültiger Familien-Schlüssel' }, 401);
   const body = await request.json().catch(() => null);
-  if (!body || typeof body.library !== 'object' || Array.isArray(body.library)) return json({ error: 'Ungültige Daten' }, 400);
-  const payload = JSON.stringify(body.library);
+  const state = body?.state;
+  if (!state || typeof state.library !== 'object' || Array.isArray(state.library) || typeof state.deleted !== 'object' || Array.isArray(state.deleted)) {
+    return json({ error: 'Ungültige Daten' }, 400);
+  }
+  const payload = JSON.stringify(state);
   if (payload.length > 900000) return json({ error: 'Liste ist zu groß' }, 413);
   const now = Date.now();
   await env.DB.prepare(`INSERT INTO shared_lists (family_key, payload, updated_at)
