@@ -12,14 +12,13 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icons/icon-180.png" />
   <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="features.css" />
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
       <div>
         <div class="eyebrow">FILME · SERIEN · FORTSCHRITT</div>
-        <h1>WatchTrack <small class="version-badge">v2.1</small></h1>
+        <h1>WatchTrack <small class="version-tag">v2.2</small></h1>
       </div>
       <button id="refreshBtn" class="icon-btn" aria-label="Aktualisieren">↻</button>
     </header>
@@ -60,17 +59,33 @@
 
       <section id="view-library" class="view">
         <div class="library-stats">
-          <div class="stat"><strong id="statWatching">0</strong><span>am Schauen</span></div>
-          <div class="stat"><strong id="statCompleted">0</strong><span>fertig</span></div>
-          <div class="stat"><strong id="statWatchlist">0</strong><span>Watchlist</span></div>
+          <div class="stat"><strong id="statWatching">0</strong><span>Schaue ich</span></div>
+          <div class="stat"><strong id="statCompleted">0</strong><span>Gesehen</span></div>
+          <div class="stat"><strong id="statWatchlist">0</strong><span>Will ich sehen</span></div>
         </div>
-        <div class="segmented" role="tablist" aria-label="Listenstatus">
+        <div class="segmented" role="tablist">
           <button class="seg active" data-libfilter="all">Alle</button>
-          <button class="seg" data-libfilter="watchlist">Will ich sehen</button>
           <button class="seg" data-libfilter="watching">Schaue ich</button>
           <button class="seg" data-libfilter="completed">Gesehen</button>
+          <button class="seg" data-libfilter="watchlist">Will ich sehen</button>
         </div>
         <div id="libraryContent" class="library-list"></div>
+      </section>
+
+      <section id="view-calendar" class="view">
+        <div class="section-head">
+          <div>
+            <h2>Kalender</h2>
+            <p>Was kommt wann – aus deiner Liste und bei Streamingdiensten.</p>
+          </div>
+        </div>
+        <div class="segmented calendar-switch">
+          <button class="seg active" data-calendar-source="mine">Meine Termine</button>
+          <button class="seg" data-calendar-source="streaming">Streaming bald</button>
+        </div>
+        <div id="providerFilterRow" class="chip-row provider-filter-row" hidden></div>
+        <div id="calendarNote" class="calendar-note"></div>
+        <div id="calendarContent" class="calendar-list"></div>
       </section>
 
       <section id="view-settings" class="view">
@@ -128,6 +143,7 @@
       <button class="nav-btn active" data-view="discover"><span>◉</span><small>Entdecken</small></button>
       <button class="nav-btn" data-view="search"><span>⌕</span><small>Suche</small></button>
       <button class="nav-btn" data-view="library"><span>✓</span><small>Meine Liste</small></button>
+      <button class="nav-btn" data-view="calendar"><span>▣</span><small>Kalender</small></button>
       <button class="nav-btn" data-view="settings"><span>⚙</span><small>Setup</small></button>
     </nav>
   </div>
@@ -139,6 +155,5 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="app.js"></script>
-  <script src="features.js"></script>
 </body>
 </html>
