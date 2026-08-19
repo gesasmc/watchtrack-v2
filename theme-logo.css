@@ -1,0 +1,29 @@
+:root{
+  --bg:#090909;
+  --panel:#121212;
+  --panel2:#191919;
+  --panel3:#222222;
+  --line:#303030;
+  --text:#f7f4ed;
+  --muted:#aaa49a;
+  --accent:#d5a62a;
+  --accent2:#f0c85a;
+  --danger:#d96b6b;
+  --good:#c7a33a;
+}
+html,body{background:var(--bg)}
+body{background:radial-gradient(circle at 88% -8%,rgba(213,166,42,.15),transparent 34%),linear-gradient(180deg,#0b0b0b 0%,#090909 100%)}
+a,.text-link{color:#e1bd55}.topbar{background:linear-gradient(var(--bg) 72%,transparent)}
+.version-tag{color:#d9b24b}.icon-btn{background:rgba(18,18,18,.9);border-color:#34312a}
+.segmented{background:#111;border-color:#2c2a25}.seg.active{background:#242018;color:#fff7df;box-shadow:inset 0 0 0 1px rgba(213,166,42,.18),0 1px 10px rgba(0,0,0,.3)}
+.chip{background:#121212;border-color:#2d2b27}.chip.active{background:#2a2417;border-color:#8d6d20;color:#ffe7a0}
+.primary{background:linear-gradient(180deg,#dfb538,#bd8e19);color:#15110a;border-color:#e5bf4c;text-shadow:0 1px rgba(255,255,255,.15)}
+.secondary{background:#181818;color:#f3eee3;border-color:#302d27}.danger{background:rgba(217,107,107,.09);color:#ee9d9d;border-color:rgba(217,107,107,.25)}
+.search-wrap input:focus,textarea:focus,select:focus{border-color:#b88c22;box-shadow:0 0 0 3px rgba(213,166,42,.12)}
+.nav-btn.active{color:#fff}.nav-btn.active span{color:#dfb538}.bottom-nav{background:rgba(12,12,12,.92);border-top-color:#2c2a25}
+.library-badge{background:#d4aa36;color:#15110a}.rating-badge{color:#f0c85a}.progress>span{background:linear-gradient(90deg,#b88919,#f0c85a)}
+.connection-dot.ok{background:#d4aa36;box-shadow:0 0 0 5px rgba(213,166,42,.12)}
+.spinner{border-color:#36332d;border-top-color:#d9b24b}.type-kicker{color:#dfb538}.next-episode{background:linear-gradient(135deg,rgba(213,166,42,.14),rgba(255,255,255,.025));border-color:#4a3c1f}.next-episode span{color:#dfb538}
+.season-toggle,.text-link,.provider-attribution a{color:#dcb64d}.season-all{color:#e4c566}.check-btn.done{background:#d4aa36;color:#15110a}
+.trailer-btn{background:#f4efe4;color:#111}.toast{background:#1b1a17}.settings-card,.media-card,.library-row,.season,.stat{box-shadow:0 10px 28px rgba(0,0,0,.16)}
+#wtPreference .pref-btn.selected,#wtPreference .pref-btn.is-selected{border-color:#d5a62a!important;background:#2b2415!important;color:#ffe6a0!important;box-shadow:0 0 0 1px rgba(213,166,42,.18) inset}
