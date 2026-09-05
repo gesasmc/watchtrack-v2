@@ -1,4 +1,4 @@
-/* WatchTrack v3.2.2 – UI polish for Setup */
+/* WatchTrack v3.3 – UI polish for Setup */
 (()=>{
   function polishSync(){
     const card=document.querySelector('#familySyncCard');
