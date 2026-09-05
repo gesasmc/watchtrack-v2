@@ -1,4 +1,4 @@
-const CACHE='watchtrack-v3.3-rec-feedback';
+const CACHE='watchtrack-v3.3-routefix';
 const SHELL=['./','./index.html','./styles.css','./features.css','./custom.css','./v24.css','./sync.css','./notifications.css','./next-up.css','./preference.css','./theme-logo.css','./theme-mode.css','./recommendation-feedback.css','./app.js','./features.js','./custom.js','./v24.js','./sync.js','./series-first.js','./stable-progress.js','./notifications.js','./next-up.js','./recommendations.js','./upcoming-library.js','./v3.js','./theme-mode.js','./ui-polish.js','./manifest.webmanifest','./icons/icon-180.png','./icons/icon-192.png','./icons/icon-512.png'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
