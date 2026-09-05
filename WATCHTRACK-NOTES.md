@@ -125,3 +125,4 @@ Theme-Dateien: `theme-logo.css`, `theme-mode.css`, `theme-mode.js`, zusätzlich 
 Aktuell keine weitere offene gewünschte Funktion nach v3.3. Erst im Alltag beobachten, was tatsächlich fehlt oder stört.
 
 <!-- deployment trigger: 2026-09-05 -->
+<!-- deployment trigger 2: 2026-09-05T14:49+02:00 -->
