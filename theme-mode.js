@@ -1,4 +1,4 @@
-/* WatchTrack v3.2.2 – Darstellung: System | Hell | Dunkel */
+/* WatchTrack v3.3 – Darstellung: System | Hell | Dunkel */
 (()=>{
  const KEY='wt_theme_mode';
  const mq=window.matchMedia('(prefers-color-scheme: dark)');
@@ -17,7 +17,7 @@
    const lock=document.createElement('div'); lock.className='brand-lockup';
    const img=document.createElement('img'); img.className='app-brand-icon'; img.src='icons/icon-180.png'; img.alt=''; img.setAttribute('aria-hidden','true');
    topbar.insertBefore(lock,text); lock.append(img,text);
-   const version=text.querySelector('.version-tag'); if(version)version.textContent='v3.2.2';
+   const version=text.querySelector('.version-tag'); if(version)version.textContent='v3.3';
  }
  function mount(){const settings=document.querySelector('#view-settings');if(settings&&!document.querySelector('#themeModeCard')){const first=settings.querySelector('.settings-card');const card=document.createElement('div');card.id='themeModeCard';card.className='settings-card theme-card';card.innerHTML=`<h2>Darstellung</h2><p>Wähle, wie WatchTrack dargestellt werden soll.</p><div class="theme-options"><button class="theme-option" data-theme-mode="system">◐<small>System</small></button><button class="theme-option" data-theme-mode="light">☀️<small>Hell</small></button><button class="theme-option" data-theme-mode="dark">🌙<small>Dunkel</small></button></div>`;if(first)settings.insertBefore(card,first);else settings.prepend(card);card.querySelectorAll('[data-theme-mode]').forEach(b=>b.addEventListener('click',()=>set(b.dataset.themeMode)));}mountBrand();apply();}
  mq.addEventListener?.('change',()=>{if(stored()==='system')apply('system');});
