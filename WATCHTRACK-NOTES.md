@@ -126,3 +126,4 @@ Aktuell keine weitere offene gewünschte Funktion nach v3.3. Erst im Alltag beob
 
 <!-- deployment trigger: 2026-09-05 -->
 <!-- deployment trigger 2: 2026-09-05T14:49+02:00 -->
+<!-- deployment trigger 3: after Cloudflare output-directory change -->
