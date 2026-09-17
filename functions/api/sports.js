@@ -1,24 +1,16 @@
-const BASE='https://www.thesportsdb.com/api/v1/json/123';
+const TSD='https://www.thesportsdb.com/api/v1/json/123';
+const FD='https://api.football-data.org/v4';
+const UFC='https://api.ufcalendar.com/v1';
 const json=(x,s=200)=>new Response(JSON.stringify(x),{status:s,headers:{'content-type':'application/json; charset=utf-8','cache-control':'public, max-age=900'}});
-async function get(path){const r=await fetch(`${BASE}/${path}`,{cf:{cacheTtl:3600,cacheEverything:true}});if(!r.ok)throw new Error(`Sport-API ${r.status}`);return r.json();}
 const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
-const COUNTRY_MAP={germany:'Germany',deutschland:'Germany',bundesliga:'Germany',england:'England',spain:'Spain',spanien:'Spain',italy:'Italy',italien:'Italy',france:'France',frankreich:'France',austria:'Austria',osterreich:'Austria',switzerland:'Switzerland',schweiz:'Switzerland',netherlands:'Netherlands',niederlande:'Netherlands',portugal:'Portugal'};
-export async function onRequestGet({request}){
- const u=new URL(request.url),action=u.searchParams.get('action')||'',id=(u.searchParams.get('id')||'').replace(/[^0-9]/g,''),q=(u.searchParams.get('q')||'').trim();
- try{
-  if(action==='search'){
-   if(q.length<2)return json({results:[]});
-   const needle=norm(q),results=[];
-   // Keep free-tier searches deliberately small: TheSportsDB allows only 30 requests/minute.
-   // Germany first because WatchTrack currently targets DE; only fall back to one extra country when the query names it.
-   let country='Germany';for(const [k,v] of Object.entries(COUNTRY_MAP)){if(needle.includes(norm(k))){country=v;break}}
-   const teams=await get(`search_all_teams.php?s=Soccer&c=${encodeURIComponent(country)}`);
-   for(const t of teams.teams||[]){if(norm(t.strTeam).includes(needle)||norm(t.strTeamAlternate).includes(needle)){results.push({id:t.idTeam,type:'team',name:t.strTeam,sport:t.strSport||'Soccer',country:t.strCountry||country,league:t.strLeague||'',badge:t.strBadge||''});if(results.length>=10)break}}
-   if(results.length<10){const leagues=await get('all_leagues.php');for(const x of leagues.leagues||[]){if(norm(x.strLeague).includes(needle)||norm(x.strLeagueAlternate).includes(needle)){results.push({id:x.idLeague,type:'league',name:x.strLeague,sport:x.strSport||'',country:x.strCountry||'',badge:x.strBadge||''});if(results.length>=10)break}}}
-   return json({results});
-  }
-  if(!id)return json({error:'ID fehlt'},400);
-  let path='';if(action==='team-next')path=`eventsnext.php?id=${id}`;else if(action==='league-next')path=`eventsnextleague.php?id=${id}`;else if(action==='team')path=`lookupteam.php?id=${id}`;else if(action==='league')path=`lookupleague.php?id=${id}`;else return json({error:'Unbekannte Aktion'},400);
-  return json(await get(path));
- }catch(e){if(String(e.message).includes('429'))return json({error:'Die kostenlose Sport-API ist gerade ausgelastet. Bitte in etwa einer Minute erneut suchen.'},429);return json({error:e.message||'Sport-API nicht erreichbar'},502)}
-}
+async function fetchJson(url,headers={}){const r=await fetch(url,{headers,cf:{cacheTtl:1800,cacheEverything:true}});let data={};try{data=await r.json()}catch{};if(!r.ok){const e=new Error(data.message||data.error||`API ${r.status}`);e.status=r.status;throw e}return data}
+async function footballSearch(q,env){if(!env.FOOTBALL_DATA_TOKEN)return null;const headers={'X-Auth-Token':env.FOOTBALL_DATA_TOKEN};const needle=norm(q),out=[];let offset=0;for(let page=0;page<5&&out.length<12;page++,offset+=100){const d=await fetchJson(`${FD}/teams?limit=100&offset=${offset}`,headers);for(const t of d.teams||[]){if([t.name,t.shortName,t.tla].some(v=>norm(v).includes(needle))){out.push({id:String(t.id),type:'team',provider:'football-data',name:t.name,shortName:t.shortName||'',sport:'Soccer',country:t.area?.name||'',league:(t.runningCompetitions||[])[0]?.name||'',badge:t.crest||''});if(out.length>=12)break}}if(!(d.teams||[]).length||offset+100>=(d.count||0))break}return out}
+async function oktagonSearch(q,env){if(!/oktagon/i.test(q)||!env.UFCALENDAR_TOKEN)return null;const headers={Authorization:`Bearer ${env.UFCALENDAR_TOKEN}`};const d=await fetchJson(`${UFC}/events?org=oktagon&status=upcoming&limit=20`,headers);return [{id:'oktagon',type:'league',provider:'ufcalendar',name:'OKTAGON MMA',sport:'MMA',country:'Europe',badge:'',events:(d.data||[]).map(e=>({id:e.slug,title:e.title,when:e.starts_at,note:'OKTAGON MMA'}))}]}
+async function legacy(action,id){let path='';if(action==='team-next')path=`eventsnext.php?id=${id}`;else if(action==='league-next')path=`eventsnextleague.php?id=${id}`;else if(action==='team')path=`lookupteam.php?id=${id}`;else if(action==='league')path=`lookupleague.php?id=${id}`;else throw Object.assign(new Error('Unbekannte Aktion'),{status:400});return fetchJson(`${TSD}/${path}`)}
+export async function onRequestGet({request,env}){const u=new URL(request.url),action=u.searchParams.get('action')||'',id=(u.searchParams.get('id')||'').replace(/[^0-9]/g,''),q=(u.searchParams.get('q')||'').trim(),provider=u.searchParams.get('provider')||'';try{
+ if(action==='status')return json({football:!!env.FOOTBALL_DATA_TOKEN,combat:!!env.UFCALENDAR_TOKEN});
+ if(action==='search'){if(q.length<2)return json({results:[]});const combat=await oktagonSearch(q,env);if(combat)return json({results:combat});const football=await footballSearch(q,env);if(football)return json({results:football});return json({results:[],setup:!env.FOOTBALL_DATA_TOKEN?'football-data-token':null,message:'Für die zuverlässige Fußballsuche fehlt noch der kostenlose football-data.org API-Token.'});}
+ if(action==='team-next'&&provider==='football-data'){if(!env.FOOTBALL_DATA_TOKEN)return json({error:'Football-Data Token fehlt'},503);const d=await fetchJson(`${FD}/teams/${id}/matches?status=SCHEDULED&limit=20`,{'X-Auth-Token':env.FOOTBALL_DATA_TOKEN});return json({events:(d.matches||[]).map(m=>({idEvent:String(m.id),strEvent:`${m.homeTeam?.name||''} – ${m.awayTeam?.name||''}`,strLeague:m.competition?.name||'',strTimestamp:m.utcDate}))});}
+ if(action==='league-next'&&provider==='ufcalendar'){if(!env.UFCALENDAR_TOKEN)return json({error:'UFCalendar Token fehlt'},503);const d=await fetchJson(`${UFC}/events?org=oktagon&status=upcoming&limit=20`,{Authorization:`Bearer ${env.UFCALENDAR_TOKEN}`});return json({events:(d.data||[]).map(e=>({idEvent:e.slug,strEvent:e.title,strLeague:'OKTAGON MMA',strTimestamp:e.starts_at}))});}
+ if(!id)return json({error:'ID fehlt'},400);return json(await legacy(action,id));
+}catch(e){return json({error:e.message||'Sport-API nicht erreichbar'},e.status&&e.status<600?e.status:502)}}
