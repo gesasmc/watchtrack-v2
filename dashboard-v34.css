@@ -1,0 +1,13 @@
+/* WatchTrack v3.4 – cleaner dashboard foundation; existing features stay intact */
+:root{--wt-gold:#f3c64d}
+.topbar{align-items:center}.topbar .eyebrow{letter-spacing:.11em}.topbar h1{display:flex;align-items:baseline;gap:7px}
+.wt-section-switch{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0 16px;padding:5px;border:1px solid var(--line);border-radius:16px;background:var(--panel)}
+.wt-section-btn{appearance:none;border:0;border-radius:12px;padding:11px 7px;background:transparent;color:var(--muted);font:inherit;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px}
+.wt-section-btn.active{background:var(--accent);color:#17130a;box-shadow:0 5px 18px rgba(0,0,0,.16)}
+.wt-section-btn[data-wt-section="sport"]{position:relative}.wt-section-btn[data-wt-section="sport"]::after{content:'bald';position:absolute;right:5px;top:-6px;padding:2px 5px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);color:var(--muted);font-size:8px;text-transform:uppercase;letter-spacing:.05em}
+#view-discover .media-switch{display:none}
+.wt-overview{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 18px}
+.wt-overview-card{min-width:0;border:1px solid var(--line);background:var(--panel);border-radius:15px;padding:11px 9px}.wt-overview-card strong{display:block;font-size:18px;line-height:1.1}.wt-overview-card span{display:block;margin-top:4px;color:var(--muted);font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wt-sport-placeholder{display:none}.wt-sport-placeholder.active{display:block;border:1px solid var(--line);background:linear-gradient(145deg,var(--panel),var(--panel2));border-radius:18px;padding:20px 16px;margin-top:4px}.wt-sport-placeholder h2{margin:0 0 7px}.wt-sport-placeholder p{margin:0;color:var(--muted);line-height:1.45}.wt-sport-preview{display:grid;gap:9px;margin-top:16px}.wt-sport-row{border:1px solid var(--line);border-radius:13px;padding:11px 12px;background:var(--bg);display:flex;gap:10px;align-items:center}.wt-sport-row b{font-size:13px}.wt-sport-row small{display:block;color:var(--muted);margin-top:2px}
+.section-head{margin-top:4px}.chip-row{padding-bottom:4px}.card-grid{gap:11px}.media-card{border-radius:15px;overflow:hidden}
+@media(max-width:430px){.wt-section-btn{font-size:12px;padding:10px 4px}.wt-overview-card strong{font-size:16px}.wt-overview-card{padding:10px 7px}}
