@@ -137,16 +137,19 @@ function renderCategoryChips() {
 
 async function fetchDiscover(type, category, page) {
   const common = { language: 'de-DE', page };
+  const langs=(state.contentLanguages||['de','en']).join('|');
+  const discoverBase={...common,sort_by:'popularity.desc',include_adult:false,with_original_language:langs};
   if (type === 'movie') {
     if (category === 'upcoming') return api('/movie/upcoming', { ...common, region: state.region });
     if (category === 'now') return api('/movie/now_playing', { ...common, region: state.region });
-    if (category === 'popular') return api('/movie/popular', { ...common, region: state.region });
-    if (category === 'top') return api('/movie/top_rated', { ...common, region: state.region });
-    return api('/discover/movie', { ...common, region: state.region, sort_by: 'popularity.desc', include_adult: false, 'primary_release_date.lte': todayISO() });
+    if (category === 'popular') return api('/discover/movie', { ...discoverBase, region: state.region });
+    if (category === 'top') return api('/discover/movie', { ...discoverBase, region: state.region, sort_by:'vote_average.desc', 'vote_count.gte':100 });
+    return api('/discover/movie', { ...discoverBase, region: state.region, 'primary_release_date.lte': todayISO() });
   }
   if (category === 'upcoming') {
     return api('/discover/tv', {
       ...common,
+      with_original_language: langs,
       sort_by: 'first_air_date.asc',
       include_adult: false,
       include_null_first_air_dates: false,
@@ -156,9 +159,9 @@ async function fetchDiscover(type, category, page) {
     });
   }
   if (category === 'onair') return api('/tv/on_the_air', common);
-  if (category === 'popular') return api('/tv/popular', common);
-  if (category === 'top') return api('/tv/top_rated', common);
-  return api('/discover/tv', { ...common, sort_by: 'popularity.desc', include_adult: false, 'first_air_date.lte': todayISO() });
+  if (category === 'popular') return api('/discover/tv', discoverBase);
+  if (category === 'top') return api('/discover/tv', { ...discoverBase, sort_by:'vote_average.desc', 'vote_count.gte':100 });
+  return api('/discover/tv', { ...discoverBase, 'first_air_date.lte': todayISO() });
 }
 
 async function loadDiscover({ append = false } = {}) {
