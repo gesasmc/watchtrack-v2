@@ -45,6 +45,20 @@ async function ensureTables(db) {
     notified_at INTEGER NOT NULL,
     PRIMARY KEY(family_key, movie_id)
   )`).run();
+  await db.prepare(`CREATE TABLE IF NOT EXISTS sport_push_subscriptions (
+    endpoint TEXT PRIMARY KEY, person_id TEXT NOT NULL, p256dh TEXT NOT NULL, auth TEXT NOT NULL,
+    event_day INTEGER NOT NULL DEFAULT 1, one_hour INTEGER NOT NULL DEFAULT 1,
+    created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL
+  )`).run();
+  await db.prepare(`CREATE TABLE IF NOT EXISTS sport_notification_events (
+    person_id TEXT NOT NULL, event_id TEXT NOT NULL, title TEXT NOT NULL, event_time TEXT NOT NULL,
+    notify INTEGER NOT NULL DEFAULT 1, updated_at INTEGER NOT NULL,
+    PRIMARY KEY(person_id,event_id)
+  )`).run();
+  await db.prepare(`CREATE TABLE IF NOT EXISTS sport_notifications_sent (
+    person_id TEXT NOT NULL,event_id TEXT NOT NULL,kind TEXT NOT NULL,notified_at INTEGER NOT NULL,
+    PRIMARY KEY(person_id,event_id,kind)
+  )`).run();
   await db.prepare(`CREATE TABLE IF NOT EXISTS notification_meta (
     key TEXT PRIMARY KEY,
     value TEXT NOT NULL
@@ -200,5 +214,18 @@ export async function onRequestGet({ env }) {
     }
   }
 
+  const sportRows=await env.DB.prepare(`SELECT s.endpoint,s.person_id,s.p256dh,s.auth,s.event_day,s.one_hour,e.event_id,e.title,e.event_time
+    FROM sport_push_subscriptions s JOIN sport_notification_events e ON e.person_id=s.person_id
+    WHERE e.notify=1`).all();
+  const now=Date.now();
+  for(const row of sportRows.results||[]){
+    const at=new Date(row.event_time).getTime(); if(!Number.isFinite(at))continue;
+    const local=new Date(at),sameDay=new Date().toISOString().slice(0,10)===local.toISOString().slice(0,10);
+    const checks=[row.event_day&&sameDay&&at>now?['day','Heute: '+row.title,'Dein Sporttermin ist heute.']:null,row.one_hour&&at-now>0&&at-now<=70*60000?['hour','In etwa 1 Stunde: '+row.title,'Dein Sporttermin beginnt bald.']:null].filter(Boolean);
+    for(const [kind,title,body] of checks){
+      const seen=await env.DB.prepare('SELECT 1 AS yes FROM sport_notifications_sent WHERE person_id=? AND event_id=? AND kind=?').bind(row.person_id,row.event_id,kind).first();if(seen)continue;
+      try{const r=await sendWebPush({endpoint:row.endpoint,keys:{p256dh:row.p256dh,auth:row.auth}},{title,body,url:'/',tag:`sport-${row.event_id}-${kind}`},env.VAPID_PRIVATE_KEY);if(r.ok){notifications++;await env.DB.prepare('INSERT OR IGNORE INTO sport_notifications_sent(person_id,event_id,kind,notified_at) VALUES(?,?,?,?)').bind(row.person_id,row.event_id,kind,Date.now()).run();}}catch(e){console.log('sport push error',e?.message||e)}
+    }
+  }
   return reply({ ok: true, families: (families.results || []).length, checkedSeries, checkedMovies, notifications });
 }
