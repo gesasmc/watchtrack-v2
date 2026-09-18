@@ -1,8 +1,23 @@
 /
-  Cache-Control: no-store, no-cache, must-revalidate
+  Cache-Control: no-cache, no-store, must-revalidate
+
 /index.html
-  Cache-Control: no-store, no-cache, must-revalidate
+  Cache-Control: no-cache, no-store, must-revalidate
+
 /watchtrack-v330-live.html
-  Cache-Control: no-store, no-cache, must-revalidate
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/app-v33.html
+  Cache-Control: no-cache, no-store, must-revalidate
+
 /sw.js
-  Cache-Control: no-store, no-cache, must-revalidate
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/manifest.webmanifest
+  Cache-Control: no-cache, must-revalidate
+
+/*.js
+  Cache-Control: no-cache, must-revalidate
+
+/*.css
+  Cache-Control: no-cache, must-revalidate
