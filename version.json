@@ -1,5 +1,5 @@
 {
-  "version": "3.4.20",
+  "version": "3.4.21",
   "release": "2026-09-18",
-  "update": "strict-language-filter"
+  "update": "language-filter-legacy-layer-fix"
 }
