@@ -4,7 +4,6 @@
 .wt-section-switch{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0 16px;padding:5px;border:1px solid var(--line);border-radius:16px;background:var(--panel)}
 .wt-section-btn{appearance:none;border:0;border-radius:12px;padding:11px 7px;background:transparent;color:var(--muted);font:inherit;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px}
 .wt-section-btn.active{background:var(--accent);color:#17130a;box-shadow:0 5px 18px rgba(0,0,0,.16)}
-.wt-section-btn[data-wt-section="sport"]{position:relative}.wt-section-btn[data-wt-section="sport"]::after{content:'bald';position:absolute;right:5px;top:-6px;padding:2px 5px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);color:var(--muted);font-size:8px;text-transform:uppercase;letter-spacing:.05em}
 #view-discover .media-switch{display:none}
 .wt-overview{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 18px}
 .wt-overview-card{min-width:0;border:1px solid var(--line);background:var(--panel);border-radius:15px;padding:11px 9px}.wt-overview-card strong{display:block;font-size:18px;line-height:1.1}.wt-overview-card span{display:block;margin-top:4px;color:var(--muted);font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
