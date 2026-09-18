@@ -43,7 +43,7 @@ card = function(x, type) {
 
 function wtRenderDiscoverContent() {
   const box = $('#discoverContent');
-  const items = state.discoverItems || [];
+  const items = (state.discoverItems || []).filter(languageAllowed);
   if (!items.length) {
     box.className = 'card-grid';
     box.innerHTML = empty('Keine Treffer', 'Für diese Auswahl wurden keine Titel gefunden.');
@@ -113,7 +113,7 @@ function wtRenderProviderChips() {
 const wtBaseFetchDiscover = fetchDiscover;
 fetchDiscover = async function(type, category, page) {
   if (!state.providerFilter) return wtBaseFetchDiscover(type, category, page);
-  const common = { language: 'de-DE', page, watch_region: state.region, with_watch_providers: state.providerFilter, include_adult: false };
+  const common = { language: 'de-DE', page, watch_region: state.region, with_watch_providers: state.providerFilter, include_adult: false, with_original_language:(state.contentLanguages||['de','en']).join('|') };
   if (type === 'movie') {
     if (category === 'upcoming') return api('/discover/movie', { ...common, sort_by: 'primary_release_date.asc', 'primary_release_date.gte': todayISO(), 'primary_release_date.lte': plusDaysISO(365) });
     if (category === 'now') return api('/discover/movie', { ...common, sort_by: 'popularity.desc', 'primary_release_date.gte': plusDaysISO(-60), 'primary_release_date.lte': todayISO() });
@@ -149,7 +149,7 @@ loadDiscover = async function({ append = false } = {}) {
   try {
     const page = append ? state.discoverPage + 1 : 1;
     const data = await fetchDiscover(state.discoverType, state.discoverCategory, page);
-    let items = (data.results || []).filter(x => x.poster_path);
+    let items = (data.results || []).filter(x => x.poster_path && languageAllowed(x));
     if (state.discoverCategory === 'upcoming') {
       const dateKey = state.discoverType === 'movie' ? 'release_date' : 'first_air_date';
       items.sort((a, b) => String(a[dateKey] || '9999').localeCompare(String(b[dateKey] || '9999')));
