@@ -31,7 +31,7 @@
       let data=null;try{data=await api(`/${type}/${seed.id}/recommendations`,{language:'de-DE',page:1});}catch{}
       if(!data?.results?.length){try{data=await api(`/${type}/${seed.id}/similar`,{language:'de-DE',page:1});}catch{data={results:[]};}}
       const weight=seedWeight(seed);
-      (data.results||[]).slice(0,20).forEach((x,rank)=>{
+      (data.results||[]).filter(languageAllowed).slice(0,20).forEach((x,rank)=>{
         if(!x?.id||own.has(String(x.id))||hidden.has(String(x.id))||!x.poster_path)return;
         const k=String(x.id),cur=scored.get(k)||{item:x,score:0,positiveHits:0,negativeHits:0};
         const rankFactor=24-rank;
@@ -41,7 +41,7 @@
         scored.set(k,cur);
       });
     }));
-    const results=[...scored.values()].filter(x=>x.score>0&&x.positiveHits>0).sort((a,b)=>(b.score-a.score)||(b.positiveHits-a.positiveHits)||(a.negativeHits-b.negativeHits)).slice(0,40).map(x=>x.item);
+    const results=[...scored.values()].filter(x=>x.score>0&&x.positiveHits>0&&languageAllowed(x.item)).sort((a,b)=>(b.score-a.score)||(b.positiveHits-a.positiveHits)||(a.negativeHits-b.negativeHits)).slice(0,40).map(x=>x.item);
     return{results,page:1,total_pages:1,total_results:results.length};
   }
 
