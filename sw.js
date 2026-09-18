@@ -1,6 +1,6 @@
-const CACHE='watchtrack-runtime';
+const CACHE='watchtrack-runtime-v347';
 self.addEventListener('install',event=>event.waitUntil((async()=>{await caches.keys().then(keys=>Promise.all(keys.map(k=>caches.delete(k))));await self.skipWaiting();})()));
 self.addEventListener('activate',event=>event.waitUntil((async()=>{await caches.keys().then(keys=>Promise.all(keys.map(k=>caches.delete(k))));await self.clients.claim();})()));
-self.addEventListener('fetch',event=>{const url=new URL(event.request.url);if(url.origin!==self.location.origin||url.pathname.includes('/api/'))return;event.respondWith(fetch(event.request,{cache:'no-store'}));});
+self.addEventListener('fetch',event=>{const url=new URL(event.request.url);if(url.origin!==self.location.origin||url.pathname.includes('/api/'))return;event.respondWith((async()=>{try{return await fetch(new Request(event.request,{cache:'no-store'}))}catch{return fetch(event.request)}})());});
 self.addEventListener('push',event=>{let data={};try{data=event.data?event.data.json():{};}catch{data={title:'WatchTrack',body:'Es gibt Neuigkeiten zu deiner Liste.'};}event.waitUntil(self.registration.showNotification(data.title||'WatchTrack',{body:data.body||'',icon:'./icons/icon-192.png',badge:'./icons/icon-192.png',tag:data.tag||'watchtrack-update',data:{url:data.url||'./'}}));});
 self.addEventListener('notificationclick',event=>{event.notification.close();const target=new URL(event.notification.data?.url||'./',self.location.origin).href;event.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(list=>{for(const client of list){if('focus'in client){client.navigate(target).catch(()=>{});return client.focus();}}return clients.openWindow?clients.openWindow(target):undefined;}));});
