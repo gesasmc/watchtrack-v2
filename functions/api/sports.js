@@ -26,8 +26,28 @@ const VISUALS={
 'bremen':{badge:'SVW',theme:'green'},
 'hamburg':{badge:'HSV',theme:'blue'}
 };
-function result(t){const v=VISUALS[t.id]||{badge:(t.aliases[0]||t.name).slice(0,3).toUpperCase(),theme:'neutral'};return{id:t.id,type:'team',provider:'public-bundesliga',name:t.name,shortName:t.aliases[0],sport:'Fußball',country:'Deutschland',league:t.national?'Nationalmannschaft':'Bundesliga',badge:v.badge,theme:v.theme}}
+function result(t){const v=VISUALS[t.id]||{badge:(t.aliases[0]||t.name).slice(0,3).toUpperCase(),theme:'neutral'};return{id:t.id,type:'team',provider:'public-bundesliga',name:t.name,shortName:t.aliases[0],sport:'Fußball',country:'Deutschland',league:t.national?'Nationalmannschaft':'Bundesliga',badge:v.badge,theme:v.theme,logo:crest(t.name)}}
 const MONTH={januar:0,februar:1,maerz:2,märz:2,april:3,mai:4,juni:5,juli:6,august:7,september:8,oktober:9,november:10,dezember:11};
+const CRESTS=[
+[['mainz'],'https://crests.football-data.org/15.svg'],
+[['bayern'],'https://crests.football-data.org/5.svg'],
+[['dortmund','bvb'],'https://crests.football-data.org/4.svg'],
+[['frankfurt','eintracht'],'https://crests.football-data.org/19.svg'],
+[['monchengladbach','gladbach'],'https://crests.football-data.org/18.svg'],
+[['leverkusen'],'https://crests.football-data.org/3.svg'],
+[['schalke'],'https://crests.football-data.org/6.svg'],
+[['werder','bremen'],'https://crests.football-data.org/12.svg'],
+[['hamburger','hsv'],'https://crests.football-data.org/7.svg'],
+[['stuttgart'],'https://crests.football-data.org/10.svg'],
+[['leipzig'],'https://crests.football-data.org/721.svg'],
+[['augsburg'],'https://crests.football-data.org/16.svg'],
+[['freiburg'],'https://crests.football-data.org/17.svg'],
+[['koln'],'https://crests.football-data.org/1.svg'],
+[['union'],'https://crests.football-data.org/28.svg'],
+[['hoffenheim'],'https://crests.football-data.org/2.svg'],
+[['deutschland','germany'],'https://crests.football-data.org/759.svg']
+];
+function crest(name){const n=norm(name);const hit=CRESTS.find(([keys])=>keys.some(k=>n.includes(norm(k))));return hit?hit[1]:''}
 const NATIONAL_META={
 '2026-09-24':{location:'Johan Cruijff Arena, Amsterdam',broadcast:'RTL'},
 '2026-09-27':{location:'WWK Arena, Augsburg',broadcast:'ARD'},
@@ -36,5 +56,5 @@ const NATIONAL_META={
 '2026-11-13':{location:'Stadion Rajko Mitic, Belgrad',broadcast:'RTL'},
 '2026-11-16':{location:'Olympiastadion, Berlin',broadcast:'ARD'}
 };
-async function bundesligaEvents(team){const url=`https://datencenter.dfb.de/teams/${team.dfbSlug||team.id}?datacenter_name=datencenter`,s=strip(await text(url)),out=[],seen=new Set();const re=/(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag),?\s+(\d{1,2})\.(\d{2})\.(\d{4})\s+(\d{1,2}:\d{2})\s+Uhr\s+(.+?)\s+(?:-\s*:\s*-|\d+\s*:\s*\d+)\s+(.+?)(?=\s+(?:Schema|Vergleich|Liveticker|Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag|$))/gi;let m;while((m=re.exec(s))){const d=new Date(`${m[4]}-${m[3]}-${String(m[2]).padStart(2,'0')}T${m[5]}:00+02:00`),home=m[6].replace(/Image: Vereinslogo/gi,'').trim(),away=m[7].replace(/Image: Vereinslogo/gi,'').trim();if(d<Date.now()-86400000)continue;const key=`${d.toISOString()}-${norm(home)}-${norm(away)}`;if(seen.has(key))continue;seen.add(key);const day=d.toISOString().slice(0,10),meta=team.national?NATIONAL_META[day]||{}:{};out.push({idEvent:`football-${team.id}-${key}`,strEvent:`${home} – ${away}`,strLeague:team.national?'Deutschland · Nationalmannschaft':'Bundesliga',strTimestamp:d.toISOString(),sourceUrl:url,location:meta.location||'',broadcast:meta.broadcast||'',visual:VISUALS[team.id]||{badge:(team.aliases[0]||team.name).slice(0,3).toUpperCase(),theme:'neutral'}})}return out.slice(0,30)}
+async function bundesligaEvents(team){const url=`https://datencenter.dfb.de/teams/${team.dfbSlug||team.id}?datacenter_name=datencenter`,s=strip(await text(url)),out=[],seen=new Set();const re=/(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag),?\s+(\d{1,2})\.(\d{2})\.(\d{4})\s+(\d{1,2}:\d{2})\s+Uhr\s+(.+?)\s+(?:-\s*:\s*-|\d+\s*:\s*\d+)\s+(.+?)(?=\s+(?:Schema|Vergleich|Liveticker|Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag|$))/gi;let m;while((m=re.exec(s))){const d=new Date(`${m[4]}-${m[3]}-${String(m[2]).padStart(2,'0')}T${m[5]}:00+02:00`),home=m[6].replace(/Image: Vereinslogo/gi,'').trim(),away=m[7].replace(/Image: Vereinslogo/gi,'').trim();if(d<Date.now()-86400000)continue;const key=`${d.toISOString()}-${norm(home)}-${norm(away)}`;if(seen.has(key))continue;seen.add(key);const day=d.toISOString().slice(0,10),meta=team.national?NATIONAL_META[day]||{}:{};out.push({idEvent:`football-${team.id}-${key}`,strEvent:`${home} – ${away}`,strLeague:team.national?'Deutschland · Nationalmannschaft':'Bundesliga',strTimestamp:d.toISOString(),sourceUrl:url,location:meta.location||'',broadcast:meta.broadcast||'',homeTeam:home,awayTeam:away,homeLogo:crest(home),awayLogo:crest(away),visual:VISUALS[team.id]||{badge:(team.aliases[0]||team.name).slice(0,3).toUpperCase(),theme:'neutral'}})}return out.slice(0,30)}
 export async function onRequestGet({request}){const u=new URL(request.url),action=u.searchParams.get('action')||'',id=u.searchParams.get('id')||'',q=(u.searchParams.get('q')||'').trim(),provider=u.searchParams.get('provider')||'';try{if(action==='status')return json({football:true,combat:true,provider:'public-web'});if(action==='search')return json({results:q.length<2?[]:search(q)});if(action==='league-next'&&(provider==='public-oktagon'||id==='oktagon'))return json({events:OKTAGON.filter(e=>new Date(e.strTimestamp)>Date.now()-86400000)});if(action==='team-next'&&provider==='public-bundesliga'){const team=TEAMS.find(t=>t.id===id);if(!team)return json({error:'Verein nicht gefunden'},404);return json({events:await bundesligaEvents(team)})}return json({error:'Quelle wird noch nicht unterstützt'},400)}catch(e){return json({error:e.message||'Öffentliche Sportquelle nicht erreichbar'},e.status&&e.status<600?e.status:502)}}
