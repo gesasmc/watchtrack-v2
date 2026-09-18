@@ -21,3 +21,6 @@
 
 /*.css
   Cache-Control: no-cache, must-revalidate
+
+/version.json
+  Cache-Control: no-cache, no-store, must-revalidate
