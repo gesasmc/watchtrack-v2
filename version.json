@@ -1,5 +1,5 @@
 {
-  "version": "3.4.19",
+  "version": "3.4.20",
   "release": "2026-09-18",
-  "update": "language-filter-fix"
+  "update": "strict-language-filter"
 }
