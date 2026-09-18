@@ -51,7 +51,7 @@ function readJSON(key, fallback) {
 function saveLibrary() { localStorage.setItem('wt_library', JSON.stringify(state.library)); }
 function saveRegion() { localStorage.setItem('wt_region', state.region); }
 function saveContentLanguages(){ localStorage.setItem('wt_content_languages',JSON.stringify(state.contentLanguages)); }
-function languageAllowed(x){ return !x?.original_language || state.contentLanguages.includes(x.original_language); }
+function languageAllowed(x){ const l=String(x?.original_language||'').toLowerCase(); return !!l && state.contentLanguages.includes(l); }
 function toast(msg) {
   const el = $('#toast');
   el.textContent = msg;
