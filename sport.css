@@ -25,3 +25,7 @@
 .sport-event-bell{align-self:flex-start;width:28px;height:28px;padding:0!important;display:grid;place-items:center;border:1px solid var(--line)!important;border-radius:50%;font-size:12px!important;opacity:.58}
 .sport-event-bell.on{background:color-mix(in srgb,var(--accent) 12%,transparent);opacity:.78}
 .sport-event-bell.off{filter:grayscale(1);opacity:.35}
+
+/* Hard containment for remote event artwork: never let a poster resize the card/app. */
+.sport-event-card .sport-poster{width:78px!important;min-width:78px!important;max-width:78px!important;height:72px!important;min-height:72px!important;max-height:72px!important;overflow:hidden!important;align-self:flex-start!important}
+.sport-event-card .sport-poster img{display:block!important;width:78px!important;height:72px!important;max-width:78px!important;max-height:72px!important;object-fit:cover!important;object-position:center!important}
