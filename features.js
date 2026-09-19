@@ -177,6 +177,10 @@ syncLibraryMeta = function(data) {
   if (!lib) return;
   lib.releaseDate = data.media_type === 'movie' ? (data.release_date || lib.releaseDate || '') : (data.first_air_date || lib.releaseDate || '');
   if (data.media_type === 'tv' && data.next_episode_to_air) {
+    if(lib.status==='completed' && data.next_episode_to_air.air_date && data.next_episode_to_air.air_date<=todayISO()){
+      lib.status='watching';
+      lib.updatedAt=Date.now();
+    }
     lib.nextEpisode = {
       season: data.next_episode_to_air.season_number,
       episode: data.next_episode_to_air.episode_number,
