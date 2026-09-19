@@ -1,5 +1,5 @@
 {
-  "version": "3.4.21",
-  "release": "2026-09-18",
-  "update": "language-filter-legacy-layer-fix"
+  "version": "3.4.22",
+  "release": "2026-09-19",
+  "update": "remove-language-filter-expand-recommendations"
 }
