@@ -17,8 +17,8 @@
   }
   function hiddenFor(type){return Object.values(state.recommendationFeedback||{}).filter(x=>x&&x.type===type&&x.hidden&&Number.isFinite(Number(x.id)));}
   function pickSeeds(type){
-    const librarySeeds=Object.values(state.library||{}).filter(x=>validSeed(x,type)&&x.status!=='dropped').sort((a,b)=>Math.abs(seedWeight(b))-Math.abs(seedWeight(a))||((b.updatedAt||0)-(a.updatedAt||0))).slice(0,12);
-    const negativeSeeds=hiddenFor(type).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0)).slice(0,8).map(x=>({...x,preference:'dislike'}));
+    const librarySeeds=Object.values(state.library||{}).filter(x=>validSeed(x,type)&&x.status!=='dropped').sort((a,b)=>Math.abs(seedWeight(b))-Math.abs(seedWeight(a))||((b.updatedAt||0)-(a.updatedAt||0))).slice(0,24);
+    const negativeSeeds=hiddenFor(type).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0)).slice(0,12).map(x=>({...x,preference:'dislike'}));
     return [...librarySeeds,...negativeSeeds];
   }
 
@@ -28,10 +28,10 @@
     const hidden=new Set(hiddenFor(type).map(x=>String(x.id)));
     const scored=new Map();
     await Promise.all(seeds.map(async seed=>{
-      let data=null;try{data=await api(`/${type}/${seed.id}/recommendations`,{language:'de-DE',page:1});}catch{}
-      if(!data?.results?.length){try{data=await api(`/${type}/${seed.id}/similar`,{language:'de-DE',page:1});}catch{data={results:[]};}}
+      let data=null;try{const [p1,p2]=await Promise.all([api(`/${type}/${seed.id}/recommendations`,{language:'de-DE',page:1}),api(`/${type}/${seed.id}/recommendations`,{language:'de-DE',page:2}).catch(()=>({results:[]}))]);data={results:[...(p1.results||[]),...(p2.results||[])]};}catch{}
+      if(!data?.results?.length){try{const [p1,p2]=await Promise.all([api(`/${type}/${seed.id}/similar`,{language:'de-DE',page:1}),api(`/${type}/${seed.id}/similar`,{language:'de-DE',page:2}).catch(()=>({results:[]}))]);data={results:[...(p1.results||[]),...(p2.results||[])]};}catch{data={results:[]};}}
       const weight=seedWeight(seed);
-      (data.results||[]).filter(languageAllowed).slice(0,20).forEach((x,rank)=>{
+      (data.results||[]).slice(0,40).forEach((x,rank)=>{
         if(!x?.id||own.has(String(x.id))||hidden.has(String(x.id))||!x.poster_path)return;
         const k=String(x.id),cur=scored.get(k)||{item:x,score:0,positiveHits:0,negativeHits:0};
         const rankFactor=24-rank;
@@ -41,8 +41,8 @@
         scored.set(k,cur);
       });
     }));
-    const results=[...scored.values()].filter(x=>x.score>0&&x.positiveHits>0&&languageAllowed(x.item)).sort((a,b)=>(b.score-a.score)||(b.positiveHits-a.positiveHits)||(a.negativeHits-b.negativeHits)).slice(0,40).map(x=>x.item);
-    return{results,page:1,total_pages:1,total_results:results.length};
+    const results=[...scored.values()].filter(x=>x.score>0&&x.positiveHits>0).sort((a,b)=>(b.score-a.score)||(b.positiveHits-a.positiveHits)||(a.negativeHits-b.negativeHits)).slice(0,120).map(x=>x.item);
+    return{results,page:1,total_pages:results.length>40?3:1,total_results:results.length};
   }
 
   const baseFetchDiscover=fetchDiscover;
