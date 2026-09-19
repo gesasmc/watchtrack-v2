@@ -278,6 +278,10 @@ function syncLibraryMeta(data) {
     (data.seasons || []).filter(s => s.season_number > 0).forEach(s => {
       lib.seasonMeta[s.season_number] = { name: s.name || `Staffel ${s.season_number}`, episodeCount: s.episode_count || 0 };
     });
+    if(lib.status==='completed' && data.next_episode_to_air?.air_date && data.next_episode_to_air.air_date<=todayISO()){
+      lib.status='watching';
+      lib.updatedAt=Date.now();
+    }
   }
   saveLibrary();
 }
@@ -407,17 +411,37 @@ async function toggleEpisode(season, episode) {
   renderLibrary();
 }
 
-function setStatus(status) {
+async function setStatus(status) {
   const d = state.currentDetail;
   if (!d) return;
   const lib = ensureLib(d);
-  lib.status = status;
+  if (status === 'completed' && d.media_type === 'tv') {
+    const today=todayISO();
+    lib.seasons=lib.seasons||{};
+    lib.seasonMeta=lib.seasonMeta||{};
+    const seasons=(d.seasons||[]).filter(s=>s.season_number>0);
+    await Promise.all(seasons.map(async s=>{
+      try{
+        const sd=await api(`/tv/${d.id}/season/${s.season_number}`,{language:'de-DE'});
+        lib.seasons[s.season_number]=lib.seasons[s.season_number]||{};
+        lib.seasonMeta[s.season_number]={name:sd.name||s.name||`Staffel ${s.season_number}`,episodeCount:(sd.episodes||[]).length};
+        (sd.episodes||[]).forEach(ep=>{
+          if(ep.air_date && ep.air_date<=today) lib.seasons[s.season_number][ep.episode_number]=true;
+        });
+      }catch{}
+    }));
+    lib.status='completed';
+    lib.completedThrough=today;
+  } else {
+    lib.status = status;
+    if(status!=='completed') delete lib.completedThrough;
+  }
   lib.updatedAt = Date.now();
   syncLibraryMeta(d);
   saveLibrary();
   renderDetail(d);
   renderLibrary();
-  toast(status === 'completed' ? 'Als fertig markiert' : status === 'watching' ? 'Als „am Schauen“ markiert' : 'Zur Watchlist hinzugefügt');
+  toast(status === 'completed' ? 'Alle veröffentlichten Folgen als gesehen markiert' : status === 'watching' ? 'Als „am Schauen“ markiert' : 'Zur Watchlist hinzugefügt');
 }
 function removeCurrent() {
   const d = state.currentDetail;
