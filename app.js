@@ -24,7 +24,6 @@ const CATEGORIES = {
 const state = {
   token: localStorage.getItem('wt_tmdb_token') || '',
   region: localStorage.getItem('wt_region') || 'DE',
-  contentLanguages: readJSON('wt_content_languages', ['de','en']),
   library: readJSON('wt_library', {}),
   discoverType: 'movie',
   discoverCategory: 'upcoming',
@@ -50,8 +49,6 @@ function readJSON(key, fallback) {
 }
 function saveLibrary() { localStorage.setItem('wt_library', JSON.stringify(state.library)); }
 function saveRegion() { localStorage.setItem('wt_region', state.region); }
-function saveContentLanguages(){ localStorage.setItem('wt_content_languages',JSON.stringify(state.contentLanguages)); }
-function languageAllowed(x){ const l=String(x?.original_language||'').toLowerCase(); return !!l && state.contentLanguages.includes(l); }
 function toast(msg) {
   const el = $('#toast');
   el.textContent = msg;
@@ -137,8 +134,7 @@ function renderCategoryChips() {
 
 async function fetchDiscover(type, category, page) {
   const common = { language: 'de-DE', page };
-  const langs=(state.contentLanguages||['de','en']).join('|');
-  const discoverBase={...common,sort_by:'popularity.desc',include_adult:false,with_original_language:langs};
+  const discoverBase={...common,sort_by:'popularity.desc',include_adult:false};
   if (type === 'movie') {
     if (category === 'upcoming') return api('/movie/upcoming', { ...common, region: state.region });
     if (category === 'now') return api('/movie/now_playing', { ...common, region: state.region });
@@ -149,7 +145,6 @@ async function fetchDiscover(type, category, page) {
   if (category === 'upcoming') {
     return api('/discover/tv', {
       ...common,
-      with_original_language: langs,
       sort_by: 'first_air_date.asc',
       include_adult: false,
       include_null_first_air_dates: false,
@@ -182,7 +177,7 @@ async function loadDiscover({ append = false } = {}) {
   try {
     const page = append ? state.discoverPage + 1 : 1;
     const data = await fetchDiscover(state.discoverType, state.discoverCategory, page);
-    let items = (data.results || []).filter(x => x.poster_path && languageAllowed(x));
+    let items = (data.results || []).filter(x => x.poster_path);
     if (state.discoverCategory === 'upcoming') {
       const dateKey = state.discoverType === 'movie' ? 'release_date' : 'first_air_date';
       items.sort((a, b) => String(a[dateKey] || '9999').localeCompare(String(b[dateKey] || '9999')));
