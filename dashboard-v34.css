@@ -1,7 +1,7 @@
 /* WatchTrack v3.4 – cleaner dashboard foundation; existing features stay intact */
 :root{--wt-gold:#f3c64d}
 .topbar{align-items:center}.topbar .eyebrow{letter-spacing:.11em}.topbar h1{display:flex;align-items:baseline;gap:7px}
-.wt-section-switch{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0 16px;padding:5px;border:1px solid var(--line);border-radius:16px;background:var(--panel)}
+.wt-section-switch{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:4px 0 16px;padding:5px;border:1px solid var(--line);border-radius:16px;background:var(--panel)}
 .wt-section-btn{appearance:none;border:0;border-radius:12px;padding:11px 7px;background:transparent;color:var(--muted);font:inherit;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px}
 .wt-section-btn.active{background:var(--accent);color:#17130a;box-shadow:0 5px 18px rgba(0,0,0,.16)}
 #view-discover .media-switch{display:none}
